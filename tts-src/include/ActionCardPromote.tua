@@ -1,0 +1,26 @@
+#include "ActionCard.tua"
+
+this.modelClass = this.modelClass .. " promote"
+
+function ActionCardPromote(startingCount)
+      this.startingCount = startingCount
+      this.count = this.startingCount
+end
+      
+function resetState()
+      this.state = "ready"
+      this.count = this.startingCount
+end
+
+function onObjectDrop(playerColor, object)
+      if object ~= self then return end
+
+      if isInHand() then
+            log("card in hand")
+      else
+            log ("card not in hand")
+      end
+
+      log("card dropped")
+      Global.call("action", "booya")
+end

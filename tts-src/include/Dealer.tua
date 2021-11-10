@@ -1,0 +1,121 @@
+-- Manages moving cards from the decks to the game board
+#include "Utility.tua"
+
+function dealPointCards(callback)
+    if getObjectFromGUID(keys["point_cards_deck"]) then
+        getObjectFromGUID(keys["point_cards_deck"]).randomize()
+    end
+
+    for i = 1, 5 do
+        dealNextCard(keys["point_cards"], loc["decks"]["point_cards"], i, nil)
+    end    
+end
+
+function dealActionCards(callback)
+    if getObjectFromGUID(keys["action_cards_deck"]) then
+        getObjectFromGUID(keys["action_cards_deck"]).randomize()
+    end
+
+    for i = 1, 6 do
+        dealNextCard(keys["action_cards"], loc["decks"]["action_cards"], i, nil)
+    end
+end
+
+-- Move all contents from 'zone_from' to 'zone_to', calls callback when done.
+-- This will not move objects with the "immobile" tag
+function moveAll(zone_from, zone_to, callback)
+    callback = callback or function() end
+
+    if type(zone_from) == "string" then
+        zone_from = getObjectFromGUID(zone_from)
+    end
+
+    if type(zone_to) == "string" then
+        zone_to = getObjectFromGUID(zone_to)
+    end    
+
+    local pos_from = zone_from.getPosition();
+    local pos_to = zone_to.getPosition();
+
+    local pos_diff = {
+        x = pos_from.x - pos_to.x,
+        y = pos_from.y - pos_to.y,
+        z = pos_from.z - pos_to.z
+    }
+
+    local object_collection = zone_from.getObjects()
+
+    for i,o in ipairs(object_collection) do
+        if o.hasTag("immobile") == false then        
+            local obj_pos = o.getPosition()
+            local new_pos = {
+                x = obj_pos.x - pos_diff.x,
+                y = obj_pos.y - pos_diff.y,
+                z = obj_pos.z - pos_diff.z
+            }
+            o.setPositionSmooth(new_pos, false, false)
+        end
+    end
+
+    Wait.condition(
+        callback, 
+        function() return isMoving(object_collection) == false end,
+        5
+    )
+
+end
+
+-- return true is any object in 'object_collection' currently smooth moving.
+function isMoving(object_collection)
+    for i,o in ipairs(object_collection) do
+        if o.isSmoothMoving() then return true end
+    end
+    return false
+end
+
+-- deal a card the deck/object found at loc to the scripting zone at card_zone_keys[index]
+-- execute callback when complete
+function dealNextCard(card_zone_keys, deck_loc, index, callback)
+    callback = callback or function() end
+    local max = #card_zone_keys
+    local zone = getObjectFromGUID(card_zone_keys[index])
+
+    if zone == nil then
+        callback()
+        return
+    end
+
+    local parameters = {
+        position = zone.getPosition(),
+        flip = true,
+        index = 0,
+        callback_function = function(card)
+            Wait.time(function() card.setLock(true) end, 0.5)
+        end
+    }
+
+    local deck = getObjectAt(deck_loc, "deck")
+
+    local card = nil
+    if deck == nil then        
+        card = getObjectAt(deck_loc, "card")
+        if card ~= nil then
+            card.flip()
+            card.setPosition(zone.getPosition(), false, false)
+            card.setLock(true)
+        end
+        Wait.time(callback, 0.5) -- moving cards left expects dealing to be done
+    else
+        card = deck.takeObject(parameters);
+    end
+end
+
+-- deal a card the deck/object found at loc to the scripting zone at card_zone_keys[index]
+-- execute callback when complete
+function foo(index)
+    dealNextCard(keys["action_cards"], loc["decks"]["action_cards"], index, nil)
+end
+
+function bar(index)
+   local card = getObjectAt(loc["decks"]["action_cards"], "card")
+end

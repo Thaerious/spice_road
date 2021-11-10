@@ -1,0 +1,19 @@
+#include "Utility.tua"
+#include "Object.tua"
+
+this.owner = -1
+this.state = "ready"
+this.modelClass = this.modelClass .. " card action"
+
+function resetState()
+      this.state = "ready"
+end
+
+function isInHand(color)
+      if color == nil then color = owner end
+      local handObjects = getPlayableCards(color)
+      for index, handObject in ipairs(handObjects) do
+            if (handObject == self) then return true end
+      end
+      return false
+end

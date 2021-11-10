@@ -1,0 +1,4 @@
+#include "Object.tua"
+
+this.owner = -1
+this.modelClass = this.modelClass .. " card point"

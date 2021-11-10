@@ -1,0 +1,3 @@
+#include "ActionCard.tua"
+
+this.modelClass = this.modelClass .. " exchange"

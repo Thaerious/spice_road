@@ -1,0 +1,31 @@
+keys = {
+      board = "88e31a",
+      point_cards_deck = "258d2e",
+      action_cards_deck = "bebb58",
+      action_cards = {
+        "29bf77",
+        "06d301",
+        "8f96f8",
+        "39ea07",
+        "686f38",
+        "976c99"
+    },
+    point_cards = {
+        "04680d",
+        "3f454c",
+        "663dca",
+        "5ee922",
+        "c7d60b"
+    },      
+}
+ 
+loc = {
+      coins = {
+          gold = {x = -6.47, y = 1.77, z = 22.24},
+          silver = {x = -1.30, y = 1.77, z = 22.24}
+      },
+      decks = {
+          point_cards  = {x = 20.11, y = 1.94, z = 17.74},
+          action_cards = {x = 19.95, y = 1.97, z = 8.60}
+      }
+  }

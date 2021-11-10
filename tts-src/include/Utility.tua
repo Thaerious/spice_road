@@ -1,0 +1,59 @@
+-- return true if the object contains a 'type' var and the 'type' var contains
+-- scripts that include the Object.tua class will have a 'this' object which has a 'modelClass'
+function isModelClass(object, model_type)
+    if model_type == nil then return true end
+    if object.getTable("this") == nil then return false end
+
+    local model_class = object.getTable("this").modelClass
+    if type(model_class) ~= "string" then return false end
+
+    for i in string.gmatch(model_class, "%S+") do
+        if i == model_type then return true end
+    end
+
+    return false
+end
+
+function getPlayableCards(color)
+      r = {}
+      local handObjects = Player[color].getHandObjects();
+      for i,card in ipairs(handObjects) do
+          if isModelClass("action") then table.insert(r, card) end
+      end
+      return r
+end
+
+-- retrieve the object at position if the object is of 'clazz'.
+-- if clazz is nil return any object at position.
+-- sz is the size for the intersection ray, defaults to 2.
+-- returns nil if no object there
+-- returns first object at position if muliple are at position
+function getObjectAt(pos, clazz, sz)
+    log('getObjectAt')
+        sz = sz or 2
+   
+        local tab = {
+            origin = {pos.x, pos.y, pos.z},
+            direction = {0, 1, 0},
+            max_distance = 0,
+            type = 2,
+            size = {sz, sz, sz},
+            debug = true
+        }
+   
+        local hit = Physics.cast(tab)
+
+        if (hit == nil) then return nil end
+   
+        if clazz ~= nil then
+            for i,o in ipairs(hit) do
+                log(o.hit_object)
+                log(o.hit_object.getTable("this"))
+                if isModelClass(o.hit_object, clazz) then return o.hit_object end
+            end
+        else
+            return hit[1].hit_object
+        end
+   
+    return nil
+end
